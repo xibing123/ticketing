@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ticketing RS - PT. Cipta Hospital Indonesia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #ecf0f3;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to right, #3498db, #2c3e50);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    main {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .box {
+      background: white;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+    h2, h3 { margin-top: 0; color: #2c3e50; }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      font-weight: bold;
+      border: none;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    nav {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    nav button {
+      width: auto;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: #eee;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    nav button:hover { background: #ddd; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+      background: #fff;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      text-align: left;
+    }
+    th { background: #f0f0f0; }
+    .hide { display: none; }
+    .logout-btn {
+      background: #e74c3c;
+      margin-left: 10px;
+    }
+    .logout-btn:hover { background: #c0392b; }
+    .status-label {
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: inline-block;
+      font-size: 13px;
+    }
+    .status-open {
+      background-color: #eafaf1;
+      color: #27ae60;
+    }
+    .status-in_progress {
+      background-color: #fff8e1;
+      color: #f39c12;
+    }
+    .status-resolved {
+      background-color: #eaf2f8;
+      color: #2980b9;
+    }
+    .intro {
+      background: #fdfdfd;
+      border-left: 5px solid #3498db;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Aplikasi Ticketing - PT. Cipta Hospital Indonesia</h1>
+  </header>
+
+  <main>
+    <div id="loginBox" class="box">
+      <h2>Login</h2>
+      <div class="intro">
+        Selamat datang di aplikasi <strong>Ticketing RS</strong>. Aplikasi ini digunakan oleh karyawan untuk melaporkan masalah atau kebutuhan teknis yang terjadi di lingkungan kerja. Admin akan menindaklanjuti setiap tiket yang masuk dan mencatat statusnya.
+      </div>
+      <input type="text" id="login_name" placeholder="Nama Lengkap" />
+      <select id="login_role">
+        <option value="user">Karyawan</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button onclick="doLogin()">Masuk</button>
+    </div>
+
+    <div id="userBox" class="box hide">
+      <h2>Dashboard Karyawan</h2>
+      <div class="intro">
+        Anda dapat mengajukan tiket permasalahan melalui form di bawah ini. Pastikan menjelaskan masalah dengan detail agar admin dapat menangani dengan cepat dan tepat.
+      </div>
+      <p>Selamat datang, <span id="userName"></span>! 
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </p>
+      <h3>Form Permintaan Tiket</h3>
+      <input type="text" id="judul" placeholder="Judul Masalah">
+      <textarea id="deskripsi" placeholder="Deskripsi Masalah"></textarea>
+      <select id="prioritas">
+        <option value="Rendah">Rendah</option>
+        <option value="Sedang">Sedang</option>
+        <option value="Tinggi">Tinggi</option>
+      </select>
+      <button onclick="kirimTiket()">Kirim Tiket</button>
+    </div>
+
+    <div id="adminBox" class="box hide">
+      <h2>Dashboard Admin</h2>
+      <div class="intro">
+        Dashboard ini digunakan oleh admin untuk mengelola tiket yang masuk dari karyawan. Anda dapat memantau, mengubah status, menghapus tiket, melihat laporan harian, dan meninjau riwayat tiket yang dihapus.
+      </div>
+      <p>Halo, Admin <span id="adminName"></span>! 
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </p>
+      <nav>
+        <button onclick="tampilkan('tiket')">📋 Daftar Tiket</button>
+        <button onclick="tampilkan('laporan')">📊 Laporan</button>
+        <button onclick="tampilkan('riwayat')">📁 Riwayat Tiket</button>
+      </nav>
+
+      <div id="tiket" class="sub hide">
+        <h3>Daftar Tiket</h3>
+        <table id="tableTiket">
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Deskripsi</th>
+              <th>Prioritas</th>
+              <th>Status</th>
+              <th>Pelapor</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="laporan" class="sub hide">
+        <h3>Laporan Tiket</h3>
+        <input type="date" id="filterTanggal">
+        <input type="text" id="filterNama" placeholder="Nama Pelapor">
+        <button onclick="tampilkanLaporan()">Tampilkan</button>
+        <table id="tableLaporan">
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Prioritas</th>
+              <th>Status</th>
+              <th>Pelapor</th>
+              <th>Tanggal</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="riwayat" class="sub hide">
+        <h3>Riwayat Tiket yang Dihapus</h3>
+        <table id="tableRiwayat">
+          <thead>
+            <tr>
+              <th>Judul</th>
+              <th>Prioritas</th>
+              <th>Status</th>
+              <th>Pelapor</th>
+              <th>Tanggal</th>
+              <th>Waktu Dihapus</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const loginBox = document.getElementById("loginBox");
+    const userBox = document.getElementById("userBox");
+    const adminBox = document.getElementById("adminBox");
+
+    function doLogin() {
+      const name = document.getElementById("login_name").value;
+      const role = document.getElementById("login_role").value;
+      if (!name) return alert("Masukkan nama!");
+      localStorage.setItem("login_name", name);
+      localStorage.setItem("login_role", role);
+      showDashboard();
+    }
+
+    function showDashboard() {
+      const name = localStorage.getItem("login_name");
+      const role = localStorage.getItem("login_role");
+      if (role === "user") {
+        loginBox.classList.add("hide");
+        userBox.classList.remove("hide");
+        document.getElementById("userName").textContent = name;
+      } else if (role === "admin") {
+        loginBox.classList.add("hide");
+        adminBox.classList.remove("hide");
+        document.getElementById("adminName").textContent = name;
+        tampilkanTiket();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("login_name");
+      localStorage.removeItem("login_role");
+      location.reload();
+    }
+
+    function kirimTiket() {
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const data = {
+        judul: document.getElementById("judul").value,
+        deskripsi: document.getElementById("deskripsi").value,
+        prioritas: document.getElementById("prioritas").value,
+        status: "open",
+        reporter: localStorage.getItem("login_name"),
+        created_at: new Date().toISOString()
+      };
+      if (!data.judul || !data.deskripsi) return alert("Lengkapi semua data!");
+      tickets.push(data);
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      alert("Tiket berhasil dikirim!");
+      document.getElementById("judul").value = "";
+      document.getElementById("deskripsi").value = "";
+    }
+
+    function getStatusLabel(status) {
+      switch(status) {
+        case "open": return '<span class="status-label status-open">🟢 Open</span>';
+        case "in_progress": return '<span class="status-label status-in_progress">🟡 In Progress</span>';
+        case "resolved": return '<span class="status-label status-resolved">🔵 Resolved</span>';
+        default: return status;
+      }
+    }
+
+    function tampilkanTiket() {
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const tbody = document.querySelector("#tableTiket tbody");
+      tbody.innerHTML = "";
+      tickets.forEach((t, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${t.judul}</td>
+          <td>${t.deskripsi}</td>
+          <td>${t.prioritas}</td>
+          <td>${getStatusLabel(t.status)}</td>
+          <td>${t.reporter}</td>
+          <td>${new Date(t.created_at).toLocaleString()}</td>
+          <td>
+            <select onchange="ubahStatus(${i}, this.value)">
+              <option value="open" ${t.status === "open" ? "selected" : ""}>Open</option>
+              <option value="in_progress" ${t.status === "in_progress" ? "selected" : ""}>In Progress</option>
+              <option value="resolved" ${t.status === "resolved" ? "selected" : ""}>Resolved</option>
+            </select><br/>
+            <button onclick="hapusTiket(${i})" style="background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:6px;margin-top:5px;">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function ubahStatus(i, statusBaru) {
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      tickets[i].status = statusBaru;
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      tampilkanTiket();
+    }
+
+    function hapusTiket(index) {
+      if (confirm("Yakin ingin menghapus tiket ini?")) {
+        const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+        const deleted = JSON.parse(localStorage.getItem("deletedTickets") || "[]");
+        const tiketDihapus = { ...tickets[index], deleted_at: new Date().toISOString() };
+        deleted.push(tiketDihapus);
+        tickets.splice(index, 1);
+        localStorage.setItem("tickets", JSON.stringify(tickets));
+        localStorage.setItem("deletedTickets", JSON.stringify(deleted));
+        tampilkanTiket();
+        alert("Tiket berhasil dihapus dan dicatat di riwayat.");
+      }
+    }
+
+    function tampilkan(view) {
+      document.querySelectorAll(".sub").forEach(div => div.classList.add("hide"));
+      document.getElementById(view).classList.remove("hide");
+      if (view === "tiket") tampilkanTiket();
+      if (view === "riwayat") tampilkanRiwayat();
+    }
+
+    function tampilkanLaporan() {
+      const tanggal = document.getElementById("filterTanggal").value;
+      const nama = document.getElementById("filterNama").value.toLowerCase();
+      const tbody = document.querySelector("#tableLaporan tbody");
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      tbody.innerHTML = "";
+      tickets.filter(t => {
+        const tgl = t.created_at.slice(0, 10);
+        return (!tanggal || tgl === tanggal) &&
+               (!nama || t.reporter.toLowerCase().includes(nama));
+      }).forEach(t => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${t.judul}</td>
+          <td>${t.prioritas}</td>
+          <td>${getStatusLabel(t.status)}</td>
+          <td>${t.reporter}</td>
+          <td>${new Date(t.created_at).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function tampilkanRiwayat() {
+      const tbody = document.querySelector("#tableRiwayat tbody");
+      const deleted = JSON.parse(localStorage.getItem("deletedTickets") || "[]");
+      tbody.innerHTML = "";
+      deleted.forEach(t => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${t.judul}</td>
+          <td>${t.prioritas}</td>
+          <td>${getStatusLabel(t.status)}</td>
+          <td>${t.reporter}</td>
+          <td>${new Date(t.created_at).toLocaleString()}</td>
+          <td>${new Date(t.deleted_at).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    window.onload = showDashboard;
+  </script>
+</body>
+</html>
